@@ -69,7 +69,20 @@ Subst.prototype.unify = function(term1, term2) {
 // Part III: Program.prototype.solve()
 // -----------------------------------------------------------------------------
 
+function State(query, rules, rules_idx, subst, prev_state) {
+	this.query = query;
+	this.rules = rules;
+	this.rules_idx = rules_idx;
+	this.subst = subst;
+	this.prev_state = prev_state;
+}
+
 Program.prototype.solve = function() {
-  throw new TODO("Program.prototype.solve not implemented");
+	this.curr_state = new State(this.query, this.rules, 0, new Subst(), null);
+	return this;
+};
+
+Program.prototype.next = function() {
+	// do things
 };
 
