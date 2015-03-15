@@ -25,11 +25,19 @@ Rule.prototype.makeCopyWithFreshVarNames = function() {
 };
 
 Clause.prototype.rewrite = function(subst) {
-  throw new TODO("Clause.prototype.rewrite not implemented");
+	var args = this.args.map(function (arg) {
+		return arg.rewrite(subst);
+	});
+	return new Clause(this.name, args);
 };
 
 Var.prototype.rewrite = function(subst) {
-  throw new TODO("Var.prototype.rewrite not implemented");
+	var new_val = subst.lookup(this.name);
+	if (new_val) {
+		return new_val.rewrite(subst);
+	} else {
+		return new Var(this.name);
+	}
 };
 
 // -----------------------------------------------------------------------------
