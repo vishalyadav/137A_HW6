@@ -10,7 +10,7 @@ function makeSingleCopy(c) {
 	var args = [];
 	c.args.map(function (v) {
 		if (v instanceof Var) {
-			args.push(new Var("__" + c.args[0].name + "__"));
+			args.push(new Var("__" + v.name + "__"));
 		} else {
 			args.push(makeSingleCopy(v));
 		}
@@ -78,11 +78,25 @@ function State(query, rules, rules_idx, subst, prev_state) {
 }
 
 Program.prototype.solve = function() {
-	this.curr_state = new State(this.query, this.rules, 0, new Subst(), null);
+	var new_rules = [];
+	for (var i = 0; i < this.rules.length; i++) {
+		new_rules.push(this.rules[i].makeCopyWithFreshVarNames());
+	}
+	this.state = new State(this.query, this.rules, 0, new Subst(), null);
 	return this;
 };
 
 Program.prototype.next = function() {
-	// do things
+	// if we've exhausted all possible solutions, return false to be falsy value
+	if (this.state === null) {
+		return false;
+	}
+
+/*	var new_subst = this.state.subst.clone();
+	try {
+		new_subst = subst.unify(this.state.query[0], this.state.rules[0]);
+	} catch (e) {
+
+	}*/
 };
 
