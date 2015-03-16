@@ -49,20 +49,20 @@ Subst.prototype.unify = function(term1, term2) {
 	term2 = term2.rewrite(this);
 	if (term1 instanceof Var) {
 		this.bind(term1.name, term2);
-		return this;
-	}
-	if (term2 instanceof Var) {
+	} else if (term2 instanceof Var) {
 		this.bind(term2.name, term1);
-		return this;
-	}
-	if (term1.name === term2.name &&
+	} else if (term1.name === term2.name &&
 		term1.args.length === term2.args.length) {
 		for (var i = 0; i < term1.args.length; i++) {
 			this.unify(term1.args[i], term2.args[i]);
 		}
-		return this;
+	} else {
+		throw new Error("unification failed");
 	}
-	throw new Error("unification failed");
+	for (var name in this.bindings) {
+		this.bind(name, this.lookup(name).rewrite(this));
+	}
+	return this;
 };
 
 // -----------------------------------------------------------------------------
