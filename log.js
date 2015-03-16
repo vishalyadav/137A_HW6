@@ -86,17 +86,36 @@ Program.prototype.solve = function() {
 	return this;
 };
 
+/* BASIC APPROACH TO NEXT()
+	1. Try to unify first element of query array with head of first rule,
+		copy that into subst
+	2a. If that unification fails, call next again, but go to the next rule
+	2b. If it passes (sweet, you've satisfied at least one element of the
+		query!), keep going on in the function.
+	3a. If the rule that passed unification has a body, that body needs
+		to be unified as well. To keep the code clean, the best way to do
+		this might be to prepend this to the query array, and then call next
+		again.
+	3b. If the rule doesn't have a body, proceed in the function.
+	4a. If there are more query elements to check, save the current state in
+		case we have to backtrack, then reset the rule index to 0 and 
+		makeCopyWithFreshVarNames on all the rules so we can kind of start
+		anew. Make sure we're only looking at the remaining queries though!
+		Now call next again.
+	4b. If there are no more query elements to check, we can return the subst
+		at the current state!
+	5. Not done yet though. Although an answer has been returned, next can be 
+		called again to try to get more answers. So we can try with the remaining
+		rules. Then if we exhaust all the rules, we go back to our previous 
+		state (where we saved the backtrack). This part's a bit fuzzy for me,
+		but I think the previous state should be saved RIGHT AFTER one of the
+		query elements has been satisfied.
+	6. Fin.
+*/
 Program.prototype.next = function() {
 	// if we've exhausted all possible solutions, return false to be falsy value
 	if (this.state === null) {
 		return false;
 	}
-
-/*	var new_subst = this.state.subst.clone();
-	try {
-		new_subst = subst.unify(this.state.query[0], this.state.rules[0]);
-	} catch (e) {
-
-	}*/
 };
 
