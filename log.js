@@ -77,11 +77,16 @@ function State(query, rules, rules_idx, subst, prev_state) {
 	this.prev_state = prev_state;
 }
 
-Program.prototype.solve = function() {
+function freshRules(rules) {
 	var new_rules = [];
-	for (var i = 0; i < this.rules.length; i++) {
-		new_rules.push(this.rules[i].makeCopyWithFreshVarNames());
+	for (var i = 0; i < rules.length; i++) {
+		new_rules.push(rules[i].makeCopyWithFreshVarNames());
 	}
+	return new_rules
+}
+
+Program.prototype.solve = function() {
+	this.rules = freshRules(this.rules);
 	this.state = new State(this.query, this.rules, 0, new Subst(), null);
 	return this;
 };
@@ -113,9 +118,31 @@ Program.prototype.solve = function() {
 	6. Fin.
 */
 Program.prototype.next = function() {
-	// if we've exhausted all possible solutions, return false to be falsy value
 	if (this.state === null) {
 		return false;
 	}
+	if (this.state.rules_idx === this.state.rules.length) {
+		this.state = this.state.prev_state;
+		return this.next();
+	}
+	var subst;
+	var rule = this.state.rules[this.state.rules_idx++];
+	try {
+		subst = this.state.subst.clone();
+		subst = subst.unify(this.state.query[0], rule.head);
+	} catch (e) {
+		return this.next();
+	}
+	if (rule.body.length || this.state.query.length > 1) {
+		var new_query = this.state.query.slice(1);
+		if (rule.body.length) {
+			new_query = rule.body.concat(new_query);
+		}
+		var new_rules = freshRules(this.state.rules);
+		var new_state = new State(new_query, new_rules, 0, subst, this.state);
+		this.state = new_state;
+		return this.next();
+	}
+	return subst;
 };
 
